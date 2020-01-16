@@ -20,9 +20,7 @@ client current;
 XButtonEvent mouse;
 
 void outline(int x, int y, unsigned int width, unsigned int height) {
-
 	static int X, Y, W, H; // previous outline
-
 	GC gc = XCreateGC(d, root, GCFunction|GCLineWidth, &(XGCValues){.function = GXinvert, .line_width=3});
 	if(!gc) return;
 	XSetForeground(d, gc, WhitePixel(d, s));
@@ -64,7 +62,6 @@ void btn_press(XEvent *e){
 
 	if(!e->xbutton.subwindow) return;
 	current = get_client(e->xbutton.subwindow);
-
 	XRaiseWindow(d, current.window);
 
 	int sd = 0; // Wheel resize
@@ -74,7 +71,6 @@ void btn_press(XEvent *e){
 	XMoveResizeWindow(d, current.window, 
 			current.x      - sd, current.y      - sd,
 			current.width  + sd*2, current.height + sd*2);
-
 }
 
 void btn_release(XEvent *e){
@@ -103,10 +99,10 @@ void map_request(XEvent *e){
 	if(!XQueryPointer(d, root, &(Window){0}, &(Window){0}, &x, &y, &(int){0}, &(int){0}, &(unsigned int){0})) return;
 	Window win = e->xmaprequest.window;
 	XSelectInput(d, win, EnterWindowMask|LeaveWindowMask|SubstructureNotifyMask);
-	XMoveWindow(d, win, x, y);
+	current = get_client(win);
+	XMoveWindow(d, win, x - current.width/2, y - current.height/2);
 	XMapWindow(d, win);
 	XSetInputFocus(d, e->xcrossing.window, RevertToParent, CurrentTime);
-	current = get_client(win);
 }
 
 void enter_notify(XEvent *e){
@@ -164,7 +160,5 @@ int main() {
 	XEvent ev;
 	while(!XNextEvent(d, &ev))
 		if(event_handler[ev.type])event_handler[ev.type](&ev);
-
-	return 0;
 }
 
