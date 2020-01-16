@@ -21,7 +21,7 @@ XButtonEvent mouse;
 
 void outline(int x, int y, unsigned int width, unsigned int height) {
 
-	static int X, Y, W, H;
+	static int X, Y, W, H; // previous outline
 
 	GC gc = XCreateGC(d, root, GCFunction|GCLineWidth, &(XGCValues){.function = GXinvert, .line_width=3});
 	if(!gc) return;
@@ -36,7 +36,7 @@ void outline(int x, int y, unsigned int width, unsigned int height) {
 	H = height;
 }
 
-void set_win(){
+void init(){
 	Window *child;
 	unsigned int nchild;
 	XQueryTree(d, root, &(Window){0}, 
@@ -67,7 +67,7 @@ void btn_press(XEvent *e){
 
 	XRaiseWindow(d, current.window);
 
-	int sd = 0;
+	int sd = 0; // Wheel resize
 	if(e->xbutton.button == 4) sd = 5;
 	else if(e->xbutton.button == 5) sd = -5;
 
@@ -78,7 +78,6 @@ void btn_press(XEvent *e){
 }
 
 void btn_release(XEvent *e){
-
 	outline(0, 0, 0, 0);
 	XDefineCursor(d, root, XCreateFontCursor(d, 68));
 	if(!current.window || mouse.subwindow)return;
@@ -155,7 +154,7 @@ int main() {
 	XSelectInput(d, root, SubstructureRedirectMask);
 	XDefineCursor(d, root, XCreateFontCursor(d, 68));
 
-	set_win();
+	init();
 
 	for(int i = 1; i < 7; i++)
 		XGrabButton(d, i, Mod4Mask , DefaultRootWindow(d), True, 
