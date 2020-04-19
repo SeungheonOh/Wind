@@ -102,6 +102,8 @@ void map_request(XEvent *e){
 	current = get_client(win);
 	XMoveWindow(d, win, x - current.width/2, y - current.height/2);
 	XMapWindow(d, win);
+  XSetWindowBorder(d, win, WhitePixel(d, s));
+  XConfigureWindow(d,  win, CWBorderWidth, &(XWindowChanges){.border_width = 2});
 	XSetInputFocus(d, e->xcrossing.window, RevertToParent, CurrentTime);
 }
 
